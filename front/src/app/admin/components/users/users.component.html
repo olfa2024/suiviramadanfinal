@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Bootstrap CSS CDN (si nécessaire) -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+
+
+<h2>Liste des Utilisateurs</h2>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <!-- Table header -->
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nom</th>
+      <th>Email</th>
+      <th>Password</th>
+      <th>Role</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Table body with ngFor loop -->
+    <tr *ngFor="let user of users">
+      <td>{{ user.id }}</td>
+      <td>{{ user.name }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.password }}</td>
+      <td>{{ user.role }}</td>
+      <!-- Actions column with buttons for delete and edit -->
+      <td>
+        <div class="d-flex">
+          <!-- Bouton Supprimer -->
+          <button class="btn btn-danger mr-1" (click)="deleteUser(user.id)">
+            <i class="fas fa-trash-alt"></i>
+
+          </button>
+          <div style="width: 10px;"></div>
+          <button (click)="updateUser()" class="btn btn-success">
+            <i class="fas fa-edit"></i>
+          </button>
+        </div>
+      </td>
+
+
+    </tr>
+    </tbody>
+    <button type="button" class=" btn-primary" (click)=" createUser()" [routerLink]="'/add-utilisateur'">
+      <i class="fas fa-plus"></i> Ajouter Utilisateur
+    </button>
+  </table>
+
+</div>
+
+<!-- Button to open add utilisateur modal -->
+
+
+
+
+

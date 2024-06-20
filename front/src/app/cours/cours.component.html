@@ -1,0 +1,17 @@
+<main id="main">
+  <section id="about" class="about">
+    <div class="container">
+      <div class="row gy-6">
+        <div class="col-lg-4" *ngFor="let item of imagesAndVideos">
+          <div class="content ps-0 ps-lg-5">
+            <div class="position-relative mt-4">
+              <img [src]="item.imageurl" class="img-fluid rounded-4" alt="">
+              <a [href]="item.videourl" class="glightbox play-btn"></a><br><br><br><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+

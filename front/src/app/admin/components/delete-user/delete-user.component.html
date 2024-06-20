@@ -1,0 +1,6 @@
+<!-- delete-user.component.html -->
+<form (ngSubmit)="supprimerUtilisateur()">
+  <label for="userId">ID de l'utilisateur à supprimer :</label>
+  <input type="text" id="userId" name="userId" [(ngModel)]="id">
+  <button type="submit">Supprimer l'utilisateur</button>
+</form>

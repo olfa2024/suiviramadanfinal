@@ -1,0 +1,72 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '25d21243-d56e-4857-9611-7090cbf0adfc'
+  imageRepository: 'suiviramadangit'
+  containerRegistry: 'olfaadevops.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/front/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+ 
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      default
+    steps:
+    - task:  Maven@4
+ 
+    
+      inputs:
+        mavenPomFile: 'C:\agent\pfedevops\7\s\prayertime\pom.xml'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        javaHomeOption: 'Path'
+        jdkDirectory: 'C:\Program Files\Java\jdk-17\'
+        mavenVersionOption: 'Path'
+        mavenDirectory: 'C:\apache-maven-3.9.5'
+        mavenSetM2Home: true
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+      
+        
+        goals: 'package'
+      
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+    
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'k8s'
+        namespace: 'default'
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: 'kubernetus'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+        azureSubscriptionEndpointForSecrets: 'student'
+        azureContainerRegistry: 'olfaadevops.azurecr.io'
+        secretName: 'my-secret'
+    

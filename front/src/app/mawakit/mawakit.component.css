@@ -1,0 +1,14 @@
+.container label,
+.container select,
+.container button {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px; /* Adjust the margin as needed */
+}
+
+.container button {
+  margin-right: 0; /* Remove right margin for the button */
+}
+.form-control {
+  width: 1200px; /* Adjust the width as needed */
+}

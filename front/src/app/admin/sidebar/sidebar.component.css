@@ -1,0 +1,60 @@
+.vertical-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px; /* ajustez la largeur de votre sidebar selon vos besoins */
+  height: 100%; /* utilisez la hauteur de la fenêtre */
+  background-color: #dcdef6; /* couleur de fond de la barre latérale */
+  border-right: 1px solid #e5e5e5; /* bordure de séparation */
+
+
+}
+/* Sidebar */
+.sidebar {
+  background-color: #fff;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar Inner */
+.sidebar-inner {
+  padding: 20px;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Slimscroll */
+.slimscroll {
+  overflow-y: auto;
+}
+
+/* Sidebar Menu Item */
+.sidebar-menu li {
+  margin-bottom: 10px;
+}
+
+/* Sidebar Menu Link */
+.sidebar-menu li a {
+  color: #333;
+  text-decoration: none;
+  display: block;
+  padding: 10px 0;
+  transition: all 0.3s ease;
+}
+
+/* Active Sidebar Menu Link */
+.sidebar-menu li.active a {
+  color: #007bff;
+  font-weight: bold;
+}

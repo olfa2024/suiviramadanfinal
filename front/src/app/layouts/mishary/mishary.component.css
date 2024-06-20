@@ -1,0 +1,37 @@
+
+audio#audio {
+  width: 95%;
+  align-content: flex-end;
+}
+
+
+
+.audio-info {
+  flex: 1;
+}
+
+
+
+.image-container img{
+  width: 250px; /* Ajustez la taille de l'image selon vos besoins */
+  height: 250px; /* Ajustez la taille de l'image selon vos besoins */
+  border-radius: 50%; /* Rendre l'image ronde */
+  object-fit: cover;
+  margin-top: 20px;
+  padding : -10px;
+
+
+}
+
+.image-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centrer verticalement */
+  align-items: center; /* Centrer horizontalement */
+  text-align: center; /* Alignement du texte au centre */
+}
+
+
+
+
+

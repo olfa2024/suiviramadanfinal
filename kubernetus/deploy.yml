@@ -1,0 +1,253 @@
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:latest
+        env:
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "0000"
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgres-persistent-storage
+          mountPath: /var/lib/postgresql/data
+        - name: remote-sql-volume
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: postgres-persistent-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: remote-sql-volume
+        configMap:
+          name: export-sql-configmap
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app:  postgres
+    k8s-app:  postgres
+  name: postgres
+  
+spec:
+  selector:
+    app: postgres
+  ports:
+   - name: http
+     port: 5432
+     protocol: TCP
+     targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prayertime
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prayertime
+  template:
+    metadata:
+      labels:
+        app: prayertime
+    spec:
+      containers:
+      - name: prayertime
+        image:  olfaadevops.azurecr.io/pfe-prayertime:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8098
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres:5432/postgres
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "0000"
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: http://eureka-server:8761/eureka/
+      imagePullSecrets:
+      - name: my-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prayertime
+    k8s-app: prayertime
+  name: prayertime
+spec:
+  selector:
+    app: prayertime
+  ports:
+  - name: http
+    port: 8098
+    protocol: TCP
+    targetPort: 8098
+  type: LoadBalancer
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ramadan
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ramadan
+      tier: ramadan
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: ramadan
+        tier: ramadan
+        track: stable
+    spec:
+      containers:
+      - name: suiviramadan
+        image: olfaadevops.azurecr.io/suiviramadangit:22
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/usr/sbin/nginx", "-s", "quit"]
+        resources:
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+        env:
+        - name: BACKEND_URL
+          value: "http://micro-prayer:8083"
+      imagePullSecrets:
+      - name: my-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ramadan
+spec:
+  selector:
+    app: ramadan
+    tier: ramadan
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: gateway
+        image: olfasalem/gateway:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: http://eureka-server:8761/eureka/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gateway
+    k8s-app: gateway
+  name: gateway
+spec:
+  type: LoadBalancer
+  selector:
+    app: gateway
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      containers:
+      - name: eureka-server
+        image: olfaadevops.azurecr.io/eureka-server:latest
+        ports:
+        - containerPort: 8761
+        env:
+        - name: EUREKA_INSTANCE_HOSTNAME
+          value: eureka
+        - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+          value: "false"
+        - name: EUREKA_CLIENT_FETCH_REGISTRY
+          value: "false"
+        - name: EUREKA_SERVER_ENABLE_SELF_PRESERVATION
+          value: "false"
+      imagePullSecrets:
+      - name: my-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eureka-server
+    k8s-app: eureka-server
+  name: eureka-server
+spec:
+  selector:
+    app: eureka-server
+  ports:
+  - name: http
+    port: 8761
+    protocol: TCP
+    targetPort: 8761
+  type: LoadBalancer
+
